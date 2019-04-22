@@ -1,0 +1,107 @@
+*{
+    margin: 0;
+    padding: 0;
+    font-family: PingFangSC-Light, 微软雅黑;
+}
+body,html{
+    width: 100%;
+    height: 100%;
+    //color:#333;
+    /* overflow: hidden;*/
+}
+/*各浏览器显示不同，去掉蓝色边框*/
+fieldset, img, input, button {
+    border: none;
+    padding: 0;
+    margin: 0;
+    outline-style: none;
+}
+img {
+    border: 0;
+    vertical-align: middle;
+}
+ul, li {
+    list-style: none;
+}
+a {
+    text-decoration: none;!important;
+    cursor: pointer;
+}
+/*清除浮动*/
+.clear-both:before, .clear-both:after {
+    display: table;
+    content: "";
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    clear: both;
+}
+.clearfix {
+    *zoom: 1; /*IE/7/6*/
+}
+.fl{
+    float: left;
+}
+.fr{
+    float: right;
+}
+
+/*content 开始*/
+
+.content{
+    margin: 20px;
+    width: calc(100% - 40px);
+    min-width: 1366px;
+}
+.content>.content_title{
+    width: 100%;
+    height: 35px;
+    line-height: 35px;
+    background-color: #4b8df8;
+    box-sizing: border-box;
+    margin-bottom: 20px;
+}
+.content>.content_title>p{
+    color:#fff;
+    font-size: 16px;
+    font-weight: 600;
+}
+.content>.content_title>img{
+    margin: 10px 10px 0px 10px;
+}
+.content>.content_main{
+    min-width: 1366px;
+}
+.content>.content_main>.content_search>div{
+    margin-right: 25px;
+}
+.content>.content_main>.content_search>div>label{
+    width: 80px;
+    text-align: right;
+}
+.content>.content_main>.content_search>div>select,
+.content>.content_main>.content_search>div>input
+{
+    width: 200px;
+}
+.content>.content_main>.content_table{
+    margin-top: 30px;
+}
+.content>.content_main>.content_table>table{
+    margin-top: 15px;
+}
+.content>.content_main>.content_table>table th:nth-child(1),
+.content>.content_main>.content_table>table td:nth-child(1){
+    width: 50px;
+    text-align: center;
+}
+
+.content>.content_main>.content_page>span {
+    font-size: 12.8px;
+    margin-top: 7px;
+}
+.content>.content_main>.content_page>select{
+    width: 70px;
+    margin-right: 10px;
+}
+/*content 结束*/

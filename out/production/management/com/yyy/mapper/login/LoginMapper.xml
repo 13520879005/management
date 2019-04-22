@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yyy.dao.login.LoginDao">
+    <select id="queryTagList" resultType="java.util.HashMap">
+        select tagid as code,tagname as name from user_tag where tagstatus ='1'
+    </select>
+
+    <insert id="insertZcxx" parameterType="java.util.HashMap">
+        insert into
+          user_zcxx
+          (userid,useraccount,userpassword,passwordshow,status)
+        VALUES
+          (#{userid},#{useraccount},#{userpassword},#{passwordshow},'0')
+    </insert>
+
+    <insert id="insertJbxx" parameterType="java.util.HashMap">
+        insert into user_jbxx
+          (userid,username,usertype,userdepartment,usermajor,usertag,lastdate)
+        values
+          (#{userid},#{username},#{usertype},#{userdepartment},#{usermajor},#{usertag},now())
+    </insert>
+
+    <select id="queryLoginMap" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+                  SELECT
+                        z.userid,
+                        z.status,
+                        j.username,
+                        j.userdepartment,
+                        j.usermajor,
+                        j.usertag,
+                        j.usertype
+                  FROM
+                    user_zcxx z
+                    INNER JOIN user_jbxx j ON z.userid = j.userid
+                  WHERE
+                    z.useraccount = #{useraccount}
+                    AND z.userpassword = #{userpassword}
+    </select>
+
+    <select id="queryXueyList" resultType="java.util.HashMap">
+        select departcode,departname from user_depart where departlevel='1' and departstatus='1'
+    </select>
+
+    <select id="queryZhuanyList" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+        select departcode,departname from user_depart where departstatus='1' and departparentcode = #{departcode}
+    </select>
+</mapper>

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yyy.dao.home.HomeDao">
+    <select id="queryTjList" parameterType="java.lang.String" resultType="java.util.HashMap">
+      SELECT
+        p.pasteid,
+        p.pasteuserid,
+        (case when p.pasteusertype ='1' then '教师' when p.pasteusertype ='2' then '学生' else '管理员' end) as pasteusertype,
+        p.pastes,
+        DATE_FORMAT(p.lastdate,'%Y-%m-%d') as lastdate,
+        j.username
+    FROM
+        gg_paste p
+        LEFT JOIN user_jbxx j ON p.pasteuserid = j.userid
+        where 1=1
+        <if test="usertag != null and usertag !=''">
+         and #{usertag} like CONCAT(CONCAT('%',p.pastetag,'%'))
+        </if>
+        order by p.lastdate desc limit 5
+    </select>
+
+    <select id="queryHotList" resultType="java.util.HashMap">
+        SELECT
+            p.pasteid,
+            p.pasteuserid,
+            (case when p.pasteusertype ='1' then '教师' when p.pasteusertype ='2' then '学生' else '管理员' end) as pasteusertype,
+            p.pastes,
+            DATE_FORMAT(p.lastdate,'%Y-%m-%d') as lastdate,
+            j.username,
+            p.hits,
+            (select count(1) as num from gg_reply r where r.pasteid = p.pasteid) as replynum
+        FROM
+            gg_paste p
+            LEFT JOIN user_jbxx j ON p.pasteuserid = j.userid
+            order by replynum desc limit 5
+    </select>
+
+    <select id="queryTeacherR" resultType="java.util.HashMap">
+        SELECT
+            ifnull(j.username,'') as username,
+            count(j.username) as num
+            FROM
+            gg_reply r
+            inner JOIN user_jbxx j ON r.replyuserid = j.userid
+            where r.replyusertype='1'
+            group by username
+            limit 5
+    </select>
+
+    <select id="queryStudentR" resultType="java.util.HashMap">
+        SELECT
+            ifnull(j.username,'') as username,
+            count(j.username) as num
+            FROM
+            gg_reply r
+            inner JOIN user_jbxx j ON r.replyuserid = j.userid
+            where r.replyusertype='2'
+            group by username
+            limit 5
+    </select>
+
+    <select id="queryXuek" resultType="java.util.HashMap">
+        SELECT
+            tagname as name,
+            sum( num ) AS value
+        FROM
+            (
+            SELECT
+                t.tagname,
+                ( CASE WHEN a.pastetag IS NULL THEN 0 ELSE 1 END ) AS num
+            FROM
+                user_tag t
+                LEFT JOIN ( SELECT p.pastetag FROM gg_paste p WHERE p.STATUS = '1' ) a ON t.tagid = a.pastetag
+            WHERE
+                t.tagstatus = '1'
+            ) b
+        GROUP BY
+            tagname
+    </select>
+
+    <select id="queryWent" resultType="java.util.HashMap">
+        SELECT
+            tagname as name,
+            sum( num ) AS value
+        FROM
+            (
+            SELECT
+                t.tagname,
+                ( CASE WHEN a.pastetag IS NULL THEN 0 ELSE 1 END ) AS num
+            FROM
+                user_tag t
+                LEFT JOIN ( SELECT p.pastetag FROM gg_paste p INNER JOIN gg_reply r ON r.pasteid = p.pasteid WHERE p.STATUS = '1' ) a ON t.tagid = a.pastetag
+            WHERE
+                t.tagstatus = '1'
+            ) b
+        GROUP BY
+            tagname
+    </select>
+</mapper>

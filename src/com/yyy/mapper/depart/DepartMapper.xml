@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yyy.dao.depart.DepartDao">
+    <select id="queryDepartList" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+        select * from (
+            SELECT
+                p.departcode AS id,
+                ifnull( s.departcode, '0' ) AS pId,
+                p.departname AS name
+            FROM
+                user_depart p
+                LEFT JOIN user_depart s ON p.departparentcode = s.departcode
+                where p.departstatus='1'
+                ) as a
+            ORDER BY a.id
+    </select>
+
+    <select id="queryDepartCount" parameterType="java.util.HashMap"  resultType="java.lang.String">
+        select count(1) as num from user_depart where departstatus='1'
+        <if test="departname != null and departname !=''">
+           and departname like CONCAT(CONCAT('%', #{departname}), '%')
+        </if>
+         and departparentcode = #{departparentcode}
+    </select>
+
+    <select id="queryDepartXx" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+        select departcode,departname from user_depart where departstatus='1'
+        <if test="departname != null and departname !=''">
+            and departname like CONCAT(CONCAT('%', #{departname}), '%')
+        </if>
+        and  departparentcode = #{departparentcode} limit ${start},${pageSize}
+    </select>
+
+    <delete id="deleteDepart" parameterType="java.util.HashMap">
+        update  user_depart set departstatus = '0'  where
+        departcode = #{departcode} or departparentcode = #{departcode}
+    </delete>
+
+    <insert id="insertXuey" parameterType="java.util.HashMap">
+        insert into user_depart
+        (departid,departcode,departname,departunit,departparentcode,departlevel,departstatus,lastdate)
+        select #{departid}, MAX(departcode)+1,#{departname},MAX(departcode)+1,#{departparentcode},#{departlevel},'1',now()
+        from user_depart  where departparentcode = #{departparentcode} and departlevel = #{departlevel} GROUP BY departparentcode limit 1
+    </insert>
+    <insert id="insertXueyToNull" parameterType="java.util.HashMap">
+        insert into user_depart
+        (departid,departcode,departname,departunit,departparentcode,departlevel,departstatus,lastdate)
+        select #{departid}, '1000',#{departname},'1000',#{departparentcode},#{departlevel},'1',now()
+        from dual
+    </insert>
+
+
+    <insert id="insertZhany" parameterType="java.util.HashMap">
+        insert into user_depart
+        (departid,departcode,departname,departunit,departparentcode,departlevel,departstatus,lastdate)
+        select #{departid}, MAX(departcode)+1,#{departname},#{departparentcode},#{departparentcode},#{departlevel},'1',now()
+        from user_depart  where departparentcode = #{departparentcode} and departlevel = #{departlevel} GROUP BY departparentcode limit 1
+    </insert>
+    <insert id="insertZhanyToNull" parameterType="java.util.HashMap">
+        insert into user_depart
+        (departid,departcode,departname,departunit,departparentcode,departlevel,departstatus,lastdate)
+        select #{departid}, concat(#{departparentcode},'01'),#{departname},#{departparentcode},#{departparentcode},#{departlevel},'1',now()
+        from dual
+    </insert>
+
+    <select id="queryDepartNum"  parameterType="java.util.HashMap" resultType="java.lang.String">
+        select count(1) as num from user_depart where
+         departparentcode = #{departparentcode} and departlevel =#{departlevel}
+    </select>
+
+    <select id="queryDepartMap" parameterType="java.lang.String" resultType="java.util.HashMap">
+        select departcode,departname,departparentcode
+        from user_depart where departcode = #{departcode}
+    </select>
+
+    <update id="updateDepart" parameterType="java.util.HashMap">
+        update user_depart set departname = #{departname} where departcode = #{departcode}
+    </update>
+</mapper>

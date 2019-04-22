@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yyy.dao.user.UserDao">
+    <select id="queryUserCount" parameterType="java.util.HashMap" resultType="java.lang.String">
+        select
+            count(1) as num
+        from user_jbxx j inner join user_zcxx z on j.userid = z.userid
+        where 1=1 and z.status != '2' and z.status != '3' and j.usertype != '0'
+        <if test="username != null and username !=''">
+           and j.username = #{username}
+        </if>
+        <if test="usertype != null and usertype !=''">
+          and j.usertype = #{usertype}
+        </if>
+        <if test="userdepartment != null and userdepartment !=''">
+          and  j.userdepartment = #{userdepartment}
+        </if>
+        <if test="usermajor != null and usermajor !=''">
+          and j.usermajor = #{usermajor}
+        </if>
+    </select>
+
+    <select id="queryUserList" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+      select
+        j.userid,
+        j.username,
+        (case  when j.usertype='1' then '老师' when j.usertype='2' then '学生' else '' end) as usertype,
+        (case  when z.status='0' then '未审核' when z.status='1' then '有效' else '无效' end) as status,
+        (select d.departname from user_depart d where d.departcode = j.userdepartment) as userdepartment,
+        (select d.departname from user_depart d where d.departcode = j.usermajor) as usermajor,
+        DATE_FORMAT(j.lastdate,'%Y-%m-%d') as lastdate
+        from user_jbxx j inner join user_zcxx z on j.userid = z.userid
+      where 1=1 and z.status != '2' and z.status != '3' and j.usertype != '0'
+        <if test="username != null and username !=''">
+            and j.username = #{username}
+        </if>
+        <if test="usertype != null and usertype !=''">
+            and j.usertype = #{usertype}
+        </if>
+        <if test="userdepartment != null and userdepartment !=''">
+            and  j.userdepartment = #{userdepartment}
+        </if>
+        <if test="usermajor != null and usermajor !=''">
+            and j.usermajor = #{usermajor}
+        </if>
+        limit ${start},${pageSize}
+    </select>
+
+    <update id="updateUser" parameterType="java.lang.String">
+        update user_zcxx set status = '2' where userid = #{userid}
+    </update>
+
+    <update id="updateUserStatus" parameterType="java.util.HashMap">
+        update user_zcxx set status = #{status} where userid = #{userid}
+    </update>
+
+    <select id="queryUser" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+                  SELECT
+                        z.userid,
+                        z.status,
+                        j.username,
+                        j.userdepartment,
+                        j.usermajor,
+                        j.usertag,
+                        j.usertype
+                  FROM
+                    user_zcxx z
+                    INNER JOIN user_jbxx j ON z.userid = j.userid
+                  WHERE z.userid = #{userid}
+    </select>
+
+    <update id="updateUserPass" parameterType="java.util.HashMap">
+        update user_zcxx set passwordshow=#{passwordshow},userpassword=#{userpassword}
+            where userid = #{userid}
+    </update>
+</mapper>

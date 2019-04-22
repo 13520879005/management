@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yyy.dao.paste.PasteDao">
+    <select id="queryPasteCount" parameterType="java.util.HashMap" resultType="java.lang.String">
+        SELECT
+            count(1) as num
+        FROM
+            gg_paste p
+        where 1=1 and p.status ='1'
+            <if test="pastes != null and pastes !=''">
+                and p.pastes like CONCAT(CONCAT('%', #{pastes}), '%')
+            </if>
+               <!-- and #{usertag} like CONCAT(CONCAT('%',pastetag,'%'))-->
+    </select>
+
+    <select id="queryPaste" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+        SELECT
+            p.pasteid,
+            p.pastes,
+        ifnull((SELECT t.replys FROM gg_reply t  where t.pasteid =p.pasteid order by praise desc  limit 1	),'') as replys
+        FROM
+            gg_paste p
+        where 1=1 and p.status ='1'
+        <if test="pastes != null and pastes !=''">
+            and p.pastes like CONCAT(CONCAT('%', #{pastes}), '%')
+        </if>
+        <!--and #{usertag} like CONCAT(CONCAT('%',pastetag,'%'))-->
+    </select>
+
+    <insert id="insertPaste" parameterType="java.util.HashMap">
+        insert into
+        gg_paste
+        ( pasteid, pasteuserid, pasteusertype, pastes, hits, pastetag, lastdate,status)
+        values
+        (#{pasteid},#{pasteuserid},#{pasteusertype},#{pastes},#{hits},#{pastetag},now(),'1')
+    </insert>
+
+    <update id="updatePaste" parameterType="java.lang.String">
+        update gg_paste set hits =hits+1 where pasteid = #{pasteid}
+    </update>
+
+    <select id="queryPasteMap" parameterType="java.lang.String" resultType="java.util.HashMap">
+        SELECT
+            r.pasteid,
+            r.pasteuserid,
+            r.pasteusertype,
+            r.pastes,
+            ifnull(r.hits,'0') as hits,
+            r.pastetag,
+            r.lastdate,
+            j.username
+        FROM
+            gg_paste r
+            LEFT JOIN user_jbxx j ON r.pasteuserid = j.userid
+        WHERE
+            r.pasteid = #{pasteid}
+            order by r.hits desc
+    </select>
+
+    <select id="queryReplyList" parameterType="java.lang.String" resultType="java.util.HashMap">
+        SELECT
+            r.replyid,
+            r.replyuserid,
+            (case when r.replyusertype ='1' then '教师' when r.replyusertype ='2' then '学生' else '管理员' end) as replyusertype,
+            r.replys,
+            r.pasteid,
+            ifnull(r.praise,'0') as praise,
+            r.lastdate,
+            j.username
+        FROM
+            gg_reply r
+            LEFT JOIN user_jbxx j ON r.replyuserid = j.userid
+        WHERE
+            r.pasteid = #{pasteid}
+            order by r.praise desc
+    </select>
+
+    <insert id="insertReplys" parameterType="java.util.HashMap" >
+        INSERT INTO
+        gg_reply
+        ( replyid, replyuserid, replyusertype, replys, pasteid, praise, lastdate )
+        VALUES
+	    (#{replyid}, #{replyuserid}, #{replyusertype}, #{replys}, #{pasteid}, #{praise}, now() )
+    </insert>
+
+    <select id="queryPasteHisCount" parameterType="java.util.HashMap" resultType="java.lang.String">
+        SELECT
+        count(1) as num
+        FROM
+        gg_paste p
+        where 1=1
+        and p.pasteuserid = #{userid} and p.status ='1'
+    </select>
+
+    <select id="queryPasteHis" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+        SELECT
+        p.pasteid,
+        p.pastes,
+        ifnull(p.hits,'0') as hits,
+        DATE_FORMAT(p.lastdate,'%Y-%m-%d') as lastdate,
+        (select count(1) as num from gg_reply r where r.pasteid = p.pasteid) as replynum
+        FROM
+        gg_paste p
+        where 1=1
+        and p.pasteuserid = #{userid} and p.status ='1'
+        order by p.lastdate desc
+    </select>
+
+    <select id="queryPasteAllCount" parameterType="java.util.HashMap" resultType="java.lang.String">
+        SELECT
+        count(1) as num
+        FROM
+        gg_paste p left join user_jbxx j on p.pasteuserid = j.userid
+        where p.status ='1'
+    </select>
+
+    <select id="queryPasteAll" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+        SELECT
+        p.pasteid,
+        p.pastes,
+        ifnull(p.hits,'0') as hits,
+        DATE_FORMAT(p.lastdate,'%Y-%m-%d') as lastdate,
+        (select count(1) as num from gg_reply r where r.pasteid = p.pasteid) as replynum,
+        j.username,
+        (case when p.pasteusertype ='1' then '教师' when p.pasteusertype ='2' then '学生' else '管理员' end) as pasteusertype
+        FROM
+        gg_paste p left join user_jbxx j on p.pasteuserid = j.userid
+        where p.status ='1'
+        order by p.lastdate desc
+    </select>
+
+    <update id="updatePasteById" parameterType="java.lang.String">
+        update gg_paste set status = '0' where pasteid =#{pasteid}
+    </update>
+
+    <update id="addPraise" parameterType="java.lang.String">
+	  update gg_reply set praise = praise +1 where replyid = #{replyid}
+    </update>
+
+    <update id="delPraise" parameterType="java.lang.String">
+	  update gg_reply set praise = praise -1 where replyid = #{replyid}
+    </update>
+</mapper>

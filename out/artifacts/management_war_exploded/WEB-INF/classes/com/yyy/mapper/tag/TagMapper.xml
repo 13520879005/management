@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yyy.dao.tag.TagDao">
+    <select id="queryTagCount" resultType="java.lang.String" parameterType="java.util.HashMap">
+          SELECT
+           count(1) as num
+            FROM
+                user_tag
+            WHERE
+                tagstatus = '1'
+        <if test="tagname != null and tagname !=''">
+           and tagname like CONCAT(CONCAT('%',#{tagname},'%'))
+        </if>
+    </select>
+
+    <select id="queryTags" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+        SELECT
+        tagid,
+        tagname
+        FROM
+        user_tag
+        WHERE
+        tagstatus = '1'
+        <if test="tagname != null and tagname !=''">
+            and tagname like CONCAT(CONCAT('%',#{tagname},'%'))
+        </if>
+        limit ${start},${pageSize}
+    </select>
+
+    <insert id="inertTag" parameterType="java.util.HashMap">
+      insert into user_tag(tagid,tagname,tagstatus) values(#{tagid},#{tagname},'1')
+    </insert>
+
+    <select id="queryTagMap" parameterType="java.lang.String" resultType="java.util.HashMap">
+        SELECT
+            tagid,
+            tagname
+        FROM
+            user_tag
+        WHERE
+            tagid = #{tagid}
+    </select>
+
+    <update id="updateTag" parameterType="java.util.HashMap">
+        update user_tag set tagname =#{tagname} where tagid=#{tagid}
+    </update>
+
+    <update id="deleteTag" parameterType="java.util.HashMap">
+        update user_tag set tagstatus ='2' where tagid=#{tagid}
+    </update>
+
+</mapper>
