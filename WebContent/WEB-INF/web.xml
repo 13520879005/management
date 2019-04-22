@@ -5,6 +5,7 @@
     <param-name>contextConfigLocation</param-name>
     <param-value>classpath:applicationContext.xml</param-value>
   </context-param>
+  <!-- pdf在线预览-->
   <servlet>
     <servlet-name>pdfServlet</servlet-name>
     <servlet-class>util.PdfServlet</servlet-class>
@@ -21,6 +22,7 @@
     <servlet-name>pdfOfWordServlet</servlet-name>
     <url-pattern>/pdfOfWordServlet</url-pattern>
   </servlet-mapping>
+  <!-- pdf在线预览end-->
   <listener>
     <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
   </listener>
