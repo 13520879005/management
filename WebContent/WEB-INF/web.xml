@@ -23,6 +23,17 @@
     <url-pattern>/pdfOfWordServlet</url-pattern>
   </servlet-mapping>
   <!-- pdf在线预览end-->
+  <!-- 在上下文中添加配置文件，在使用接口服务和webservice时需要放开下面配置 -->
+  <servlet>
+    <servlet-name>ws</servlet-name>
+    <servlet-class>org.apache.cxf.transport.servlet.CXFServlet</servlet-class>
+    <load-on-startup>4</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ws</servlet-name>
+    <url-pattern>/ws/*</url-pattern>
+  </servlet-mapping>
+  <!-- 在上下文中添加配置文件，在使用接口服务和webservice时需要放开上面面配置 -->
   <listener>
     <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
   </listener>

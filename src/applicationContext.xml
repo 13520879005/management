@@ -3,12 +3,15 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:jaxws="http://cxf.apache.org/jaxws"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
         http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
         http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
         http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee.xsd
-        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+        http://cxf.apache.org/jaxws
+        http://cxf.apache.org/schemas/jaxws.xsd">
 
     <!--xmlns:context="http://www.springframework.org/schema/context"-->
     <!--除了控制器都扫描，和SpringMVC相反-->
@@ -16,6 +19,10 @@
         <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"></context:exclude-filter>
     </context:component-scan>
     <!--Spring的配置文件，这里主要配置和业务逻辑有关的-->
+
+    <import resource="classpath:META-INF/cxf/cxf.xml"/>
+    <jaxws:endpoint id="test" address="/testWebService" implementor="com.yyy.webservice.TestWebServiceImpl"></jaxws:endpoint>
+
     <!--数据源，事务控制。。-->
 
     <context:property-placeholder location="classpath:dbconfig.properties"/>
